@@ -1,2 +1,4 @@
+# Replace the necessary variables and rename this file to .yml
+
 config:
   storepath: "REPLACE THIS WITH THE FILEPATH OF WHERE YOU WANT TO DOWNLOAD THE FILES"
