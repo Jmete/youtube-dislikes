@@ -1,2 +1,2 @@
 # youtube-dislikes
-UMSI Capstone Project - Analysis and Prediction of dislikes on Youtube data
+University of Michigan - MADS - Capstone Project - Analysis and Prediction of dislikes on Youtube data
