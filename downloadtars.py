@@ -12,7 +12,7 @@ import glob
 import ssl
 import yaml
 
-config = yaml.load(open('./config.yml'))
+config = yaml.safe_load(open('./config.yml'))
 
 
 
@@ -23,6 +23,7 @@ print('Beginning file downloads with wget module')
 numfiles = 5000
 baseurl = "https://archive.org/download/Youtube_metadata_02_2019/"
 storelocation = config["config"]["storepath"]
+print(f"Store Location is: {storelocation}")
 
 # Check for existing files so we don't redownload the same files
 existing_file_paths = glob.glob(storelocation+"*.tar")
@@ -40,3 +41,5 @@ for i in range(numfiles):
             fileurl = storelocation + filenumber + ".tar"
             wget.download(durl, fileurl)
             print(f"Finished downloading {filenumber}")
+
+print("Finished downloading")
