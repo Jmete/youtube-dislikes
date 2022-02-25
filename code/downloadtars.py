@@ -16,7 +16,7 @@ import yaml
 def downloadtars():
 
     # Get config yaml for path variable
-    config = yaml.safe_load(open('../../config.yml'))
+    config = yaml.safe_load(open('././config.yml'))
 
     #get past certificate verified failed issue
     ssl._create_default_https_context = ssl._create_unverified_context

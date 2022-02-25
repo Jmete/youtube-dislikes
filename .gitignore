@@ -40,3 +40,4 @@ Thumbs.db
 
 # Hide config since it contains sensitive information including paths
 config.yml
+__pycache__
