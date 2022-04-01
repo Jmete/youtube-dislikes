@@ -11,12 +11,16 @@ import wget
 import glob
 import ssl
 import yaml
+import os
+
+ROOT_DIR = os.path.abspath(os.curdir)
+config_path = os.path.join(ROOT_DIR,"config.yml")
 
 
 def downloadtars():
 
     # Get config yaml for path variable
-    config = yaml.safe_load(open('././config.yml'))
+    config = yaml.safe_load(open(config_path))
 
     #get past certificate verified failed issue
     ssl._create_default_https_context = ssl._create_unverified_context
