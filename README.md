@@ -109,6 +109,40 @@ Data processing steps performed at this step include:
 
 <b>Note:</b> After initial investigation, we decided to go with dislike_like_ratio, although this is not present in the script. This is because it is included as a calcualated column in PostgreSQL itself. Furthermore, we used a normalization technique of adding 1 to the numerator and denominator to avoid any 0 division errors as well as avoiding too many rows simply being 0 (due to 0/X = 0). This column is a major focal point of our research since it allows us to sort the database by the dislike_like_ratio as well as determine roughly how problematic a video is. However, we will not be able to calculate this in a real-life situation due to the dislike data being hidden which is a future challenge. Thus, we must find suitable proxies during our analysis stage.
 
+## Optimizing the database
+The following command was used to optimize the database entered through psql remotely. We performed the "ANALYZE" command on the table, as well as created an index for important columns used for lookups or sorting.
+
+- ANALYZE video_data;
+- CREATE INDEX idx_views ON video_data(view_count);
+- CREATE INDEX idx_likes ON video_data(like_count);
+- CREATE INDEX idx_dislikes ON video_data(dislike_count);
+- CREATE INDEX idx_dislike_like_ratio ON video_data(dislike_like_ratio);
+
+It should be noted that during the creation of the database table, we will naturally have an index already on the unique id of the row as well as the video_id being designated as a unique column. The final indexes should be the following:
+- "video_data_pkey" PRIMARY KEY, btree (row_id)
+- "idx_dislike_like_ratio" btree (dislike_like_ratio)
+- "idx_dislikes" btree (dislike_count)
+- "idx_likes" btree (like_count)
+- "idx_views" btree (view_count)
+- "video_data_id_key" UNIQUE CONSTRAINT, btree (id)
+
+Doing so allowed us to shorten processing times from over 8 hours to a few minutes or even seconds depending on the complexity of the sql command.
+
+## Extracting csv files for analysis
+Once our data is inside PostgreSQL, we can use sql commands to run operations to extract a smaller sample size better suited for statistical analysis. The csv files we extracted were the following:
+- Exporting the top 500,000 most disliked rows based on dislike_like_ratio.
+- Exporting the top 500,000 most liked rows based on dislike_like ratio.
+- Exporting a 1% random sample resulting in over 800,000 rows.
+
+SQL Commands through psql are the following:
+- Most disliked: \copy (SELECT * FROM video_data ORDER BY dislike_like_ratio DESC LIMIT 500000) to '/run/user/1000/gvfs/smb-share:server=metebox,share=data/JAMES/datasets/youtube-meta/youtube-02-2019-dump/mostliked500k_new.csv' csv header;
+
+- Most liked: \copy (SELECT * FROM video_data ORDER BY dislike_like_ratio ASC LIMIT 500000) to '/run/user/1000/gvfs/smb-share:server=metebox,share=data/JAMES/datasets/youtube-meta/youtube-02-2019-dump/mostliked_500000.csv' csv header;
+
+- 1% Random Sample: \copy (SELECT * FROM video_data TABLESAMPLE BERNOULLI (1)) to '/run/user/1000/gvfs/smb-share:server=metebox,share=data/JAMES/datasets/youtube-meta/youtube-02-2019-dump/random_percent_1.csv' csv header;
+
+
+
 # Analysis Steps
 
 ### TO DO
