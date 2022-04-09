@@ -12,7 +12,7 @@ Dislike counts on Youtube videos are a useful signal for separating high quality
 # Dataset
 Since Youtube has removed the ability to actively scrape or query dislike counts, we have to rely on historical data to conduct our research. Luckily, extensive historical records have been kept by Archive.org, and we will use one called “Youtube Metadata Collection (2019-02)” (https://archive.org/details/Youtube_metadata_02_2019) which consists of around 1.46 Billion JSON records related to youtube metadata such as title, upload date, category, likes, dislikes, language, recommended videos, and other features. This is composed of around 5000 .tar files each with around 146 .json.gz files inside them which will require extensive data processing to download the files, process them, and store the data for future analysis. 
 
-Our processing techniques will involve taking a sample of the full dataset (every fifth file) as well as removing potential NaN / Errors in calculated fields such as the like_dislike_ratio. The end result is a dataset of <b>80,910,144 rows</b>. We can conduct large-scale analysis using SQL commands over the full dataset.
+Our processing techniques will involve taking a sample of the full dataset (we downloaded the first 25 files and then every fifth file afterwards for a total of 1025 .tar files) as well as removing potential NaN / Errors in calculated fields such as the like_dislike_ratio. The end result is a dataset of <b>80,910,144 rows</b>. We can conduct large-scale analysis using SQL commands over the full dataset.
 
 We will complement this dataset with scraped comments of top videos (based on view count) to both add an element of NLP analysis which may also be a useful signal towards predicting whether or not a video may have a high number of dislikes.
 
@@ -133,6 +133,8 @@ Once our data is inside PostgreSQL, we can use sql commands to run operations to
 - Exporting the top 500,000 most disliked rows based on dislike_like_ratio.
 - Exporting the top 500,000 most liked rows based on dislike_like ratio.
 - Exporting a 1% random sample resulting in over 800,000 rows.
+- Exporting a 10% random sample.
+- Exporting a 0.2% random sample used for final testing.
 
 SQL Commands through psql are the following:
 - Most disliked: \copy (SELECT * FROM video_data ORDER BY dislike_like_ratio DESC LIMIT 500000) to '/run/user/1000/gvfs/smb-share:server=metebox,share=data/JAMES/datasets/youtube-meta/youtube-02-2019-dump/mostliked500k_new.csv' csv header;
@@ -140,6 +142,10 @@ SQL Commands through psql are the following:
 - Most liked: \copy (SELECT * FROM video_data ORDER BY dislike_like_ratio ASC LIMIT 500000) to '/run/user/1000/gvfs/smb-share:server=metebox,share=data/JAMES/datasets/youtube-meta/youtube-02-2019-dump/mostliked_500000.csv' csv header;
 
 - 1% Random Sample: \copy (SELECT * FROM video_data TABLESAMPLE BERNOULLI (1)) to '/run/user/1000/gvfs/smb-share:server=metebox,share=data/JAMES/datasets/youtube-meta/youtube-02-2019-dump/random_percent_1.csv' csv header;
+
+- 10% Random Sample: \copy (SELECT * FROM video_data TABLESAMPLE BERNOULLI (10)) to '/run/user/1000/gvfs/smb-share:server=metebox,share=data/JAMES/datasets/youtube-meta/youtube-02-2019-dump/random_percent_10.csv' csv header;
+
+- 0.2% Random Sample: \copy (SELECT * FROM video_data TABLESAMPLE BERNOULLI (0.2)) to '/run/user/1000/gvfs/smb-share:server=metebox,share=data/JAMES/datasets/youtube-meta/youtube-02-2019-dump/random_percent_point2.csv' csv header;
 
 
 
