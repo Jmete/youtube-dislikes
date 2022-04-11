@@ -43,3 +43,6 @@ __pycache__
 
 # exclude data from source control by default
 /data/
+
+# exclude notebook checkpoints
+.ipynb_checkpoints/
