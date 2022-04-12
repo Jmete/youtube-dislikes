@@ -29,6 +29,42 @@ randompctpoint2=os.path.join(ROOT_DIR,"data/processed/random_percent_point2.csv"
 training_df_pickle_path = os.path.join(ROOT_DIR,"data/processed/training_df.pkl")
 testing_df_pickle_path = os.path.join(ROOT_DIR,"data/processed/testing_df.pkl")
 
+# Category codes from the Youtube API
+cat_code_dict = {1: 'Film & Animation',
+ 2: 'Autos & Vehicles',
+ 10: 'Music',
+ 15: 'Pets & Animals',
+ 17: 'Sports',
+ 18: 'Short Movies',
+ 19: 'Travel & Events',
+ 20: 'Gaming',
+ 21: 'Videoblogging',
+ 22: 'People & Blogs',
+ 23: 'Comedy',
+ 24: 'Entertainment',
+ 25: 'News & Politics',
+ 26: 'Howto & Style',
+ 27: 'Education',
+ 28: 'Science & Technology',
+ 29: 'Nonprofits & Activism',
+ 30: 'Movies',
+ 31: 'Anime/Animation',
+ 32: 'Action/Adventure',
+ 33: 'Classics',
+ 34: 'Comedy',
+ 35: 'Documentary',
+ 36: 'Drama',
+ 37: 'Family',
+ 38: 'Foreign',
+ 39: 'Horror',
+ 40: 'Sci-Fi/Fantasy',
+ 41: 'Thriller',
+ 42: 'Shorts',
+ 43: 'Shows',
+ 44: 'Trailers'}
+
+inv_cat_code_dict = {v: k for k, v in cat_code_dict.items()}
+
 def get_main_dfs():
     """
     Transforms csv files of main video data into dataframes ready for processing.
@@ -91,6 +127,16 @@ def ohe_ld_score(score):
     else:
         return 1
 
+def conv_category(cat_name):
+    """
+    Converts category string to number based on our mapping dict from the youtube api.
+    """
+    try:
+        cat_code = inv_cat_code_dict[cat_name]
+    except:
+        cat_code = 0
+    return cat_code
+
 def prepare_data_for_model(df,only_eng=True):
     """
     Takes in a dataframe and performs processing on it to prepare for model training.
@@ -114,7 +160,7 @@ def prepare_data_for_model(df,only_eng=True):
 
     # Convert category column to pandas category type and then take the code to convert it to a numeric value
     df["category"] = df["category"].astype('category')
-    df["cat_codes"] = df["category"].cat.codes
+    df["cat_codes"] = df["category"].apply(conv_category)
 
     # Create like_dislike_score
     df["ld_score"]=(df.like_count/(df.like_count + df.dislike_count))
