@@ -23,7 +23,9 @@ randompct=os.path.join(ROOT_DIR,"data/processed/random_percent_1.csv")
 randompctpoint2=os.path.join(ROOT_DIR,"data/processed/random_percent_point2.csv")
 
 # Comment csv files
-# TODO: ADD COMMENT CSV FILES AFTER EXPORT
+comments_liked_path =  os.path.join(ROOT_DIR, "data/processed/comments_csv/liked_videos_comments_0.csv")
+comments_disliked_path = os.path.join(ROOT_DIR,"data/processed/comments_csv/disliked_videos_comments_0.csv")
+comments_randompoint2_path = os.path.join(ROOT_DIR,"data/processed/comments_csv/randompercentpoint2_videos_comments_0.csv")
 
 # Pickle save paths
 training_df_pickle_path = os.path.join(ROOT_DIR,"data/processed/training_df.pkl")
@@ -87,7 +89,16 @@ def get_main_dfs():
     # Load 0.2% random sample for final testing of models
     randompctpoint2_df = pd.read_csv(randompctpoint2,engine="python")
 
-    return combined_df, randompctpoint2_df
+    # Load comments df
+    comments_liked_df = pd.read_csv(comments_liked_path,lineterminator='\n')
+    comments_disliked_df = pd.read_csv(comments_disliked_path,lineterminator='\n')
+    comments_train=pd.concat([comments_liked_df,comments_disliked_df])
+
+    comments_test = pd.read_csv(comments_randompoint2_path,lineterminator='\n')
+    
+    print("Dataframes loaded")
+
+    return combined_df, randompctpoint2_df, comments_train, comments_test
 
 def find_english(df,only_eng=True):
     """
@@ -101,20 +112,63 @@ def find_english(df,only_eng=True):
     data=pd.DataFrame((df.desc_text)).astype(str)
     data['scores']=data['desc_text'].apply(SentimentIntensityAnalyzer().polarity_scores)          #Apply Vader Sentiment Analysis
 
-    data['neu']=data['scores'].apply(lambda score_dict: score_dict['neu'])                        #Extract Neutral Values from dictionary
-    data['neg']=data['scores'].apply(lambda score_dict: score_dict['neg'])                        #Extract Negative Values from dictionary
-    data['pos']=data['scores'].apply(lambda score_dict: score_dict['pos'])                        #Extract Positive Values from dictionary
-    data['compound']=data['scores'].apply(lambda score_dict: score_dict['compound'])              #Extract Compound Values from dictionary
+    data['desc_neu']=data['scores'].apply(lambda score_dict: score_dict['neu'])                        #Extract Neutral Values from dictionary
+    data['desc_neg']=data['scores'].apply(lambda score_dict: score_dict['neg'])                        #Extract Negative Values from dictionary
+    data['desc_pos']=data['scores'].apply(lambda score_dict: score_dict['pos'])                        #Extract Positive Values from dictionary
+    data['desc_compound']=data['scores'].apply(lambda score_dict: score_dict['compound'])              #Extract Compound Values from dictionary
 
     combined_data=pd.concat([df,data], axis=1).reindex(df.index)                    #Add values back to original dataframe
 
     # If only eng is true, filter for only english, else return all the data
     if only_eng:
-        eng_data= combined_data[combined_data['neu'] != 1]                              #Filter out df values with a neu score of 1 (indicate foreign desc)
+        eng_data= combined_data[combined_data['desc_neu'] != 1]                              #Filter out df values with a neu score of 1 (indicate foreign desc)
         return eng_data
     else:
         return combined_data
 
+
+def clean_comments(df):
+    """
+    Takes in comment dataframe and cleans necessary columns and prepares them for sentiment analysis.
+    """
+    
+    df_clean=df[['video_id','votes','text']].copy()                                                #Select necessary columns
+    df_clean['text_cleaned'] = df_clean['text'].str.replace('[^\w\s]','')                    #Removes extra whitespaces
+    df_clean['text_cleaned'] = df_clean['text_cleaned'].str.replace('@[A-Za-z0-9]+', '')     #Removes any tags using @
+    df_clean['text_cleaned'] = df_clean['text_cleaned'].str.replace('\n', '')                #Remove newline punctuation 
+    df_clean['text_cleaned'] = df_clean['text_cleaned'].str.lower()                          #Removes Capitalization             
+
+    return df_clean
+
+
+def comment_sentiment(df_clean):
+    """
+    Takes in cleaned comment dataframe and performs sentiment analysis on it.
+    Groups by video_id using mean and returns the dataframe.
+    """
+    
+    #Designate Sentiment Analyzer
+    sid = SentimentIntensityAnalyzer()
+    
+    #Ensure Text is in string format
+    text = df_clean['text_cleaned']
+    text = str(text).encode('utf-8')
+    
+    #Apply Sentiment Analyzer to text data, parse out dictionary value to columns
+    df_clean['scores']=df_clean['text_cleaned'].apply(lambda text:sid.polarity_scores(str(text)))
+    df_clean['comment_neg']=df_clean['scores'].apply(lambda score_dict: score_dict['neg'])
+    df_clean['comment_neu']=df_clean['scores'].apply(lambda score_dict: score_dict['neu'])
+    df_clean['comment_pos']=df_clean['scores'].apply(lambda score_dict: score_dict['pos'])
+    df_clean['comment_compound']=df_clean['scores'].apply(lambda score_dict: score_dict['compound'])
+  
+    #Ensure values are in numeric format select necessary columns for analysis 
+    df_clean["votes"] = pd.to_numeric(df_clean["votes"], errors='coerce')
+    df_comm=df_clean[['video_id','votes','comment_neg','comment_neu','comment_pos','comment_compound']]
+  
+    #Group dataframe by video ID taking the mean of the comment values
+    df_comments_all=df_comm.groupby(['video_id']).mean().reset_index()
+  
+    return df_comments_all
 
 def ohe_ld_score(score):
     """
@@ -184,13 +238,33 @@ def prepare_data_for_model(df,only_eng=True):
     
     return df
 
+def create_final_dataframe(comment_df,archive_df,only_eng=True):
+    """
+    Processes comment df and archive df into one merged dataframe.
+    
+    Returns final merged dataframe
+    """
+    df_clean= clean_comments(comment_df)
+    print("Comments cleaned.")
+    df_comments_all= comment_sentiment(df_clean)
+    print("Comments processed.")
+    df_archive_all= prepare_data_for_model(archive_df,only_eng=only_eng)
+    final_df=df_archive_all.merge(
+        df_comments_all,
+        how="left",
+        left_on="id",
+        right_on="video_id").replace(np.nan, 0)
+    print("Comments and Archive data merged.")
+
+    return final_df
+
 def data_prep():
     """
     Runs data loading and processing pipeline.
     """
 
     # Get main dfs
-    combined_df, randompctpoint2_df = get_main_dfs()
+    combined_df, randompctpoint2_df, comments_training_df, comments_testing_df = get_main_dfs()
     print("Retrieved initial dataframes.")
 
     # Process main dfs
@@ -198,12 +272,12 @@ def data_prep():
     # We will export a training set focused on english videos and a testing set with all language videos.
 
     print("Processing training data...")
-    training_df = prepare_data_for_model(combined_df)
+    training_df = create_final_dataframe(comments_training_df,combined_df)
     training_df.to_pickle(training_df_pickle_path)
     print(f"Training dataframe saved to {training_df_pickle_path}")
 
     print("Processing testing data...")
-    testing_df = prepare_data_for_model(randompctpoint2_df,only_eng=False)
+    testing_df = create_final_dataframe(comments_testing_df,randompctpoint2_df,only_eng=False)
     testing_df.to_pickle(testing_df_pickle_path)
     print(f"Testing dataframe saved to {testing_df_pickle_path}")
 
