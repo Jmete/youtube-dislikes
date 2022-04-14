@@ -95,7 +95,7 @@ def get_main_dfs():
     comments_train=pd.concat([comments_liked_df,comments_disliked_df])
 
     comments_test = pd.read_csv(comments_randompoint2_path,lineterminator='\n')
-    
+
     print("Dataframes loaded")
 
     return combined_df, randompctpoint2_df, comments_train, comments_test
@@ -191,6 +191,16 @@ def conv_category(cat_name):
         cat_code = 0
     return cat_code
 
+def smooth_if_0(row):
+    """
+    Creates a smoothed view_like ratio feature to avoid division by zero for a more accurate reflection of the ratio.
+    """
+    if row["like_count"] == 0:
+        vl_ratio = (row["view_count"]+1) / (row["like_count"]+1)
+    else:
+        vl_ratio = row["view_count"] / row["like_count"]
+    return round(vl_ratio,2)
+
 def prepare_data_for_model(df,only_eng=True):
     """
     Takes in a dataframe and performs processing on it to prepare for model training.
@@ -215,6 +225,9 @@ def prepare_data_for_model(df,only_eng=True):
     # Convert category column to pandas category type and then take the code to convert it to a numeric value
     df["category"] = df["category"].astype('category')
     df["cat_codes"] = df["category"].apply(conv_category)
+
+    # Smooth view_like_ratio which helps avoid division by zero.
+    df["view_like_ratio_smoothed"] = df.apply(lambda row: smooth_if_0(row),axis=1)
 
     # Create like_dislike_score
     df["ld_score"]=(df.like_count/(df.like_count + df.dislike_count))
