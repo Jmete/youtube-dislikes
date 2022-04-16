@@ -48,3 +48,6 @@ __pycache__
 .ipynb_checkpoints/
 notebooks/outputs/
 notebooks/models/
+
+# ignore large uncompressed model
+models/rfclf_nocompression.joblib.pkl

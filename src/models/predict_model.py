@@ -4,6 +4,7 @@ import pickle
 import os
 from pathlib import Path
 import joblib
+from time import perf_counter
 
 # For local testing
 X_cols = [
@@ -30,8 +31,13 @@ X_cols = [
 # Some paths for testing the function on local data.
 ROOT_DIR = os.path.abspath(os.curdir)
 
-# Path to save the model
-model_pickle_path = os.path.join(ROOT_DIR,"models/rfclf.joblib.pkl")
+# Path to load the model
+# The model with no compression takes 1.5 seconds to load and is 945MB in size
+# The model with 3 compression takes 3.6 seconds to load and is 188MB in size
+# We are using the no compression for inference time but due to size limitations, we have the compressed version for github.
+
+# model_pickle_path = os.path.join(ROOT_DIR,"models/rfclf.joblib.pkl")
+model_pickle_path = os.path.join(ROOT_DIR,"models/rfclf_nocompression.joblib.pkl")
 
 # Test pred df
 testing_df_pickle_path = os.path.join(ROOT_DIR,"data/processed/testing_df.pkl")
@@ -43,7 +49,9 @@ def make_pred(pred_df,clf_path):
     print("Input data is:")
     print(pred_df)
     print("Loading model...")
+    start_load_time = perf_counter()
     rf_clf = joblib.load(clf_path)
+    print(f"Time taken to load model: {(perf_counter() - start_load_time) }" )
     print("Making Prediction...")
     pred = rf_clf.predict(pred_df)
     print(f"Prediction is: {pred}")
