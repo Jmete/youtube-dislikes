@@ -110,7 +110,7 @@ def prepare_data_for_pred(df):
     
     return df
 
-def create_final_dataframe(comment_df,archive_df):
+def create_final_dataframe(comment_df=None,archive_df=None):
     """
     Processes comment df and archive df into one merged dataframe.
     
@@ -137,17 +137,27 @@ def create_final_dataframe(comment_df,archive_df):
         "votes",
         "NoCommentsBinary"
     ]
+    if comment_df:
+        df_clean= clean_comments(comment_df)
+        print("Comments cleaned.")
+        df_comments_all= comment_sentiment(df_clean)
+        print("Comments processed.")
+        df_archive_all= prepare_data_for_pred(archive_df)
+        final_df=df_archive_all.merge(
+            df_comments_all,
+            how="left",
+            left_on="id",
+            right_on="video_id")
+    else:
+        print("No comments, skipping comment processing step.")
+        final_df= prepare_data_for_pred(archive_df)
+        final_df["votes"] = 0
+        final_df["comment_neu"] = 0
+        final_df["comment_neg"] = 0
+        final_df["comment_pos"] = 0
+        final_df["comment_compound"] = 0
+        
 
-    df_clean= clean_comments(comment_df)
-    print("Comments cleaned.")
-    df_comments_all= comment_sentiment(df_clean)
-    print("Comments processed.")
-    df_archive_all= prepare_data_for_pred(archive_df)
-    final_df=df_archive_all.merge(
-        df_comments_all,
-        how="left",
-        left_on="id",
-        right_on="video_id")
     final_df = final_df.replace(np.nan, 0)
 
     # Make sure the columns are in the proper order and remove some unneeded columns.
