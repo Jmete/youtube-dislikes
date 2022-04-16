@@ -249,8 +249,6 @@ def prepare_data_for_model(df,only_eng=True):
     # Replace NaN with 0s
     df=df.replace(np.nan, 0)
     
-    # TODO: Might need to normalize values
-    
     # Print out the value counts
     print("ld_score_ohe value counts:")
     print(df["ld_score_ohe"].value_counts())
