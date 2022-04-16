@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 import pickle
 import os
+from pathlib import Path
 
 # Vader for sentiment analysis
 import nltk
@@ -26,6 +27,10 @@ randompctpoint2=os.path.join(ROOT_DIR,"data/processed/random_percent_point2.csv"
 comments_liked_path =  os.path.join(ROOT_DIR, "data/processed/comments_csv/liked_videos_comments_0.csv")
 comments_disliked_path = os.path.join(ROOT_DIR,"data/processed/comments_csv/disliked_videos_comments_0.csv")
 comments_randompoint2_path = os.path.join(ROOT_DIR,"data/processed/comments_csv/randompercentpoint2_videos_comments_0.csv")
+
+# Randompct1 comment csv files were split into smaller files and processed in parallel to improve scraping time.
+# We can get all the paths via regex glob and then concat using list comprehension.
+random_csv_paths = sorted(Path(os.path.join(ROOT_DIR,"data/processed/comments_csv")).rglob("randompct1*.csv"))
 
 # Pickle save paths
 training_df_pickle_path = os.path.join(ROOT_DIR,"data/processed/training_df.pkl")
@@ -92,7 +97,9 @@ def get_main_dfs():
     # Load comments df
     comments_liked_df = pd.read_csv(comments_liked_path,lineterminator='\n')
     comments_disliked_df = pd.read_csv(comments_disliked_path,lineterminator='\n')
-    comments_train=pd.concat([comments_liked_df,comments_disliked_df])
+    comments_random_df = pd.concat([pd.read_csv(r_csv,lineterminator='\n') for r_csv in random_csv_paths],ignore_index=True)
+
+    comments_train=pd.concat([comments_liked_df,comments_disliked_df,comments_random_df],ignore_index=True)
 
     comments_test = pd.read_csv(comments_randompoint2_path,lineterminator='\n')
 
@@ -266,7 +273,10 @@ def create_final_dataframe(comment_df,archive_df,only_eng=True):
         df_comments_all,
         how="left",
         left_on="id",
-        right_on="video_id").replace(np.nan, 0)
+        right_on="video_id")
+    final_df["NoComments"] = pd.isnull(final_df["comment_compound"])
+    final_df["NoCommentsBinary"] = final_df["NoComments"].apply(lambda x: 1 if x==True else 0)
+    final_df = final_df.replace(np.nan, 0)
     print("Comments and Archive data merged.")
 
     return final_df

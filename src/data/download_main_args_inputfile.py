@@ -46,7 +46,7 @@ def run_script(start_from, should_convert_to_text_file,csv_filename):
         4.  Every 100th iteration, the program will save the data to the dataframe created in Step 2. 
         
         5.  The program can be stopped at any time. When a KeyboardInterrupt is detected, the program will save
-            the current progress to teh dataframe created in step 2. The next time the code is run, the position of
+            the current progress to the dataframe created in step 2. The next time the code is run, the position of
             the next video id can be provided. 
         
         6.  Incase ther is a network error, the program will gracefully save the extracted data to the drive, and end
