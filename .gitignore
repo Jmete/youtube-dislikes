@@ -46,4 +46,5 @@ __pycache__
 
 # exclude notebook checkpoints
 .ipynb_checkpoints/
+notebooks/outputs/
 notebooks/models/
