@@ -135,9 +135,8 @@ We modified a package on github (cdownload_noargs.py) in order to aid our web sc
 
 Running the <b>download_main_args_inputfile.py</b> function can take in the related name of the exported CSV file (such as the random 1% sample), the starting point, and a parameter for whether it should convert the CSV file id column to a list that it can loop through. Example of running it may be:
 python src/data/download_main_args_inputfile.py 0 n nameofcsvfile
-By default, it will look in the data/processed folder to find the csv files.
 
-It will save the comments to data/processed/comments_csv/filename/
+By default, it will look in the data/processed folder to find the csv files. It will save the comments to data/processed/comments_csv/filename/
 
 Note: We explored using both a custom web scraper as well as the youtube API.
 
@@ -220,6 +219,13 @@ Decent performance but took a long time to train using sklearn. We also tried a 
 Deep learning has become a pillar of the modern world, especially with the rise of larguage language models. We were curious if processing our features as one long string (separated by special tokens) would work. While it took nearly an hour to train on a GPU, the performance of the transformer network matched the Random Forest with some tweaking of the output probabilities it generated. The pre-trained base model we used was microsoft/deberta-v3-small via the HuggingFace library.
 
 We ultimately decided to go with the Random Forest due being quick to train, good predictive performance, quick inference times, and easily interpretable performance by examining the feature importance graphs. However, it is interesting that the transformer on numeric data input as text performed as well as it did. We believe an area for future research is utilizing the full text of comments / descriptions, and more tuning of the deep learning model as well as using other larger pre-trained models to examine its performance on similar data.
+
+## Running the Training Pipeline
+We developed a script (train_model.py) which will use the training_df and testing_df pickle files, as well as the X_Cols and y_col that we are interested in and use that to train the model and print out some test statistics / metrics for that model.
+
+Exported models are saved using the joblib.dump function and saved in the models folder as pickle files. The exported file will be called "rfclf.joblib.pkl".
+
+Note: By default we export a compressed model (compression=3), but for our web app we will be using the uncompressed model because it is faster to load despite taking up much more space (945 MB vs. 188 MB for the compressed version.) Furthermore, our testing showed that reducing the number of features did not change the model size much, and neither did training the model on standardized input data.
 
 # Model Results
 TODO
