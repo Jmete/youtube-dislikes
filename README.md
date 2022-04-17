@@ -125,8 +125,110 @@ Once our data is inside PostgreSQL, we can use sql commands to run operations to
 Please see the related "psql_export_csv.sql" file for details on the commands entered.
 The files exported would be used for analysis and model training/testing purposes.
 
-# Analysis Steps
+## Downloading comment data
+In order to gain further insight and acquire more data for our model to use, we decided to download the top 10 comments of each video in our exported CSVs that includes information such as:
+- Number of votes
+- Text Content
+- Hearts (only can be given by the video owner)
 
-### TO DO
+We modified a package on github (cdownload_noargs.py) in order to aid our web scraping of comments, and then made our own python file to integrate with the modified function in order to automatically loop through the videos, download the comments and related data, and store them in both individual JSON files as well as overall CSV files.
+
+Running the <b>download_main_args_inputfile.py</b> function can take in the related name of the exported CSV file (such as the random 1% sample), the starting point, and a parameter for whether it should convert the CSV file id column to a list that it can loop through. Example of running it may be:
+python src/data/download_main_args_inputfile.py 0 n nameofcsvfile
+By default, it will look in the data/processed folder to find the csv files.
+
+It will save the comments to data/processed/comments_csv/filename/
+
+Note: We explored using both a custom web scraper as well as the youtube API.
+
+# Analysis & Feature Engineering
+
+## Initial Analysis
+With our exported CSV files, we performed multiple initial analysis steps to help uncover any insights regarding the data.
+One of our main goals was to discover if any features were correlated or useful in relation to predicting dislikes, or dislike ratios.
+
+Analysis we performed included:
+- PCA Analysis
+- Feature Correlation Analysis
+- Statistical Analysis on the full database dataset as well as our subset exported into CSVs
+- Comparing the extremes of most liked and most disliked videos across multiple features
+
+## Feature Engineering
+Our initial analysis led us to ideas of feature engineering that we could calculate based on the available data. 
+
+Features we created to assist our analysis and model building include:
+- Sentiment Analysis features (negative,neutral,positive,compound) for comment text and description text. We used NLTK Vader as our sentiment analyzer. It seemed to have better performance than other libraries such as textblob and fasttext.
+- LD Score: Likes / (Likes + Dislikes)
+- LD Score OHE: Converting decimal LD Score to categorical -1 (negative), 0 (neutral), and 1 (positive).
+- View_Like Ratio: view_count / like_count
+- View_Like Ratio Smoothed: If like_count is 0, we add 1 to view_count and like_count to avoid division by 0.
+- View_Dislike Ratio: view_count / dislike_count
+- Dislike-Like Ratio: dislike_count / like_count (smoothed by 1 to avoid division by 0)
+- NoCommentsBinary: 0 if the video had comments, and 1 if the video did not have comments when we attempted to pull the data.
+
+Although we can not use any of the features involving dislike count at inference time, we used them in our analysis to better understand the data as well as filter our main dataset to extract useful rows such as the most disliked or liked video rows based on dislike_like_ratio. We believed these extremes combined with the random 1% would allow for a diverse set of video information for our machine learning models to learn from.
+
+## Preparing Data For Machine Learning
+We developed a pipeline to properly format our data as suitable dataframes for our machine learning models. Steps include:
+- Reading CSV files into DataFrames.
+- Combining our most liked, most disliked, and random 1% dataframes into one major training dataframe using pd.concat.
+- Shuffling the training dataframe.
+- Clean text columns such as description and comment text using various regex functions.
+- Performing sentiment analysis and creating relevant columns based on that.
+- Removing non-english videos of training data (we observed no lack of model predictive performance by doing so and it allows for better sentiment analysis)
+- Grouping comments by video_id and taking the mean. This will give average sentiment and votes per video_id.
+- Merging processed comments df with processed archive df based on video_id
+- Adding the NoCommentsBinary file based on the result of the data scraping.
+- Replacing NaN values with 0 (this is done first in the archive data and again after merging with comments)
+- Returning final clean dataframe
+
+Running data_prep_for_model.py will perform this pipeline automatically by taking the relevant CSV files from the data/processed folder and outputting training_df and testing_df pickled dataframes.
+
+Note: At inference time, we perform a similar function to prepare the data that we pull from the API + Comments, but slightly modified to account for which data is available and the way we can get the data since it will only need to input one video at a time instead of a batch of existing data.
+
+# Machine Learning Model Training & Testing
+We explored numerous types of models to determine which model had the best performance for our task. It should be noted that our task in this case is not actually to get the overall best performance on the entire dataset, but rather a specific focus on identifying negative videos. Thus, we relied on numerous metrics to help give a holistic view of the models performance. <b>We ultimately decided on Random Forest as the best overall choice.</b>
+
+## Performance Metrics Used
+
+Due to our imbalanced dataset (positive videos are much more numerous than negative or neutral videos), we focused on various F1 scores, Accuracy, and MCC (Matthews correlation coefficient) to track model performance.
+
+Furthermore, we checked the confusion matrix of each model to better understand which classes / labels our models were performing well on, and which they were performing poor on.
+
+## Optimizing Our Models
+In order to optimize our model we tried the following tactics:
+- GridSearch over various parameters
+- Scaling our training data via StandardScaler()
+- Manual tuning of parameters
+- Checking for feature importance and impact on predictive performance
+- Checking dataset size and impact on predictive performance
+
+## Models Tested
+The models we tested were the following:
+
+### Dummy Classifier:
+To get a baseline of performance.
+### Logistic Regression: 
+It performed better than the Dummy but wasn't ideal. However, we did not really attempt to tune it.
+### Gradient Boosting Machines: 
+Performed quite well on the overall testing dataset but sacrificed negative video accuracy in favor of positive video accuracy which is not ideal for our specific task.
+### Random Forest:
+Performed the best overall with minimal tuning, and was not impacted by standardization. The Random Forest was quick to train, performed well even with default settings, and was very interpretable due to the easy visualization capabilities of feature importance.
+### Multi-Layer Perceptron:
+Decent performance but took a long time to train using sklearn. We also tried a GPU accelerated tabular learner through fast.ai but both didn't have the best performance compared to the Random Forest. Each of them seemed to completely ignore the neutral videos.
+### Transformer Network: 
+Deep learning has become a pillar of the modern world, especially with the rise of larguage language models. We were curious if processing our features as one long string (separated by special tokens) would work. While it took nearly an hour to train on a GPU, the performance of the transformer network matched the Random Forest with some tweaking of the output probabilities it generated. The pre-trained base model we used was microsoft/deberta-v3-small via the HuggingFace library.
+
+We ultimately decided to go with the Random Forest due being quick to train, good predictive performance, quick inference times, and easily interpretable performance by examining the feature importance graphs. However, it is interesting that the transformer on numeric data input as text performed as well as it did. We believe an area for future research is utilizing the full text of comments / descriptions, and more tuning of the deep learning model as well as using other larger pre-trained models to examine its performance on similar data.
+
+# Model Results
+TODO
+- Table of various models and their performance across our chosen metrics coming soons
+- Feature Importance Chart
+- Sample size comparison chart
+
+
+
+
 
 
