@@ -20,6 +20,48 @@ Finally, we will be exporting smaller CSVs that are more useful for deeper analy
 - Exporting the top 500,000 most disliked rows based on dislike_like_ratio
 - Exporting the top 500,000 most liked rows based on dislike_like ratio
 - Exporting a 1% random sample resulting in over 800,000 rows.
+- Exporting a 0.2% random sample used for testing purposes.
+
+# TLDR:
+
+## What is provided?
+We provide the following:
+- A pre-trained Random Forest model that can be used to classify youtube videos.
+- A pipeline that can download and process data, train the model, and export it.
+- A web app to easily use the model.
+- We also have a blog where we discuss our findings in more detail and provide visualizations.
+
+Note: If you don't want to run the pipeline. You can use either the web app, or download the provided rf_clf.joblib.pkl classifier model and skip to the inference section below.
+
+## How Do I Run The Pipeline?
+ <b>We have developed a shell script to run our pipeline to download data, process it, and export a trained machine learning model that can be used to classify videos as negative, neutral, or positive</b>. The steps are as follows:
+1. Make sure you are in a linux / unix environment with a bash terminal. (Specifically Debian based distros)
+2. Install Miniconda: https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html
+3. Setup a postgres database.
+4. Fill out the config.yml file as directed. This is mainly used to locate your storage location of large files, and database parameters.
+
+## Using the model at inference time.
+Our model is a Random Forest model that was trained on youtube api data including comments, and expects the input data in a dataframe. For some elements of this, you may need access to the Youtube API. The steps for inference are:
+1. Download youtube api data with required columns which are
+- duration
+- age_limit
+- view_count
+- like_count
+- is_comments_enabled
+- is_live_content
+- cat_codes (category code number)
+2. Download comment data as df. You can use our web scraper script using a csv file with just 1 row and load as a dataframe, or use the youtube API directly.
+3. If no comments were available, make note of that in the "NoCommentsBinary" Column. 1 = No Comments.
+4. Use the create_final_dataframe() function in the data_prep_for_pred.py file that takes in the comment_df and video_data_df and will output a processed dataframe that can be used for inference. It will add a few more columns such as a smoothed view_like_ratio and sentiment analysis columns.
+5. Use the make_pred() function in the predict_model.py file to take in the processed inference dataframe and the path to the classifier (by default in the models folder) and it will output the class as a number. Note: Sometimes pandas will format a "1-row" dataframe as a series which will cause issues. You can use .to_frame().T on the series to convert it to a 1-row dataframe suitable for the model.
+6. -1 = Negative, 0 = Neutral, 1 = Positive
+
+## Using our web app
+We have developed a web app which does all of the above steps for you which makes it easy to use.
+1. Go to savethedislikes.com
+2. Input your video URL and click the button
+3. Enjoy the returned prediction and relevant data about the video!
+
 
 # Setup
 

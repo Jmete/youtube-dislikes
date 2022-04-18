@@ -1,7 +1,6 @@
 import glob
 import numpy as np
 import pandas as pd
-import cudf
 import pickle
 import yaml
 import os
@@ -80,10 +79,6 @@ def combine_json(storagepath):
 
             # Log which paths we have already done
             log_paths(ypaths)
-
-def read_parq(storagepath):
-    df = cudf.read_parquet(storagepath)
-    print(df.head())
 
 if __name__ == "__main__":
     combine_json(storagepath)
