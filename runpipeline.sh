@@ -102,8 +102,8 @@ DB_VIDEOTABLE=$(cat config.yml | (shyaml get-value config.dbvideotable))
 
 # Create Database and tabless
 printf "Creating database and table if they don't exist..."
-# PGPASSWORD=$DB_PW psql -h $DB_IsP -d $DB_NAME -U $DB_USER -p $DB_PORT -a -q -f src/data/create_database.sql
-# PGPASSWORD=$DB_PW psql -h $DB_IP -d $DB_NAME -U $DB_USER -p $DB_PORT -a -q -f src/data/create_video_table.sql
+PGPASSWORD=$DB_PW psql -h $DB_IsP -d $DB_NAME -U $DB_USER -p $DB_PORT -a -q -f src/data/create_database.sql
+PGPASSWORD=$DB_PW psql -h $DB_IP -d $DB_NAME -U $DB_USER -p $DB_PORT -a -q -f src/data/create_video_table.sql
 
 # Load parquet file data into postgres database. File naturally checks if should proceed.
 printf "\nThe next step involves loading data from the parquet files into the database. This can take a long time.\n"
