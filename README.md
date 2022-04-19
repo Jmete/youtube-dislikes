@@ -29,7 +29,7 @@ We provide the following:
 - A pre-trained Random Forest model that can be used to classify youtube videos.
 - A pipeline that can download and process data, train the model, and export it.
 - A web app to easily use the model.
-- We also have a blog where we discuss our findings in more detail and provide visualizations.
+- We also have a blog where we discuss our findings in more detail and provide visualizations.1
 
 Note: If you don't want to run the pipeline. You can use either the web app, or download the provided rf_clf.joblib.pkl classifier model and skip to the inference section below.
 
@@ -173,7 +173,7 @@ In order to gain further insight and acquire more data for our model to use, we 
 - Text Content
 - Hearts (only can be given by the video owner)
 
-We modified a package on github (cdownload_noargs.py) in order to aid our web scraping of comments, and then made our own python file to integrate with the modified function in order to automatically loop through the videos, download the comments and related data, and store them in both individual JSON files as well as overall CSV files.
+We modified a package on github (cdownload_noargs.py: https://github.com/egbertbouman/youtube-comment-downloader) in order to aid our web scraping of comments, and then made our own python file to integrate with the modified function in order to automatically loop through the videos, download the comments and related data, and store them in both individual JSON files as well as overall CSV files.
 
 Running the <b>download_main_args_inputfile.py</b> function can take in the related name of the exported CSV file (such as the random 1% sample), the starting point, and a parameter for whether it should convert the CSV file id column to a list that it can loop through. Example of running it may be:
 python src/data/download_main_args_inputfile.py 0 n nameofcsvfile

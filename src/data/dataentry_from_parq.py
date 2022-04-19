@@ -188,5 +188,3 @@ if __name__ == "__main__":
         get_data_video()
     else:
         print("Skipping video data entry.")
-    
-    ### TODO: Function to enter video comment data to comment table.
