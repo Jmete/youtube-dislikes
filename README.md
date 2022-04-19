@@ -33,6 +33,16 @@ We provide the following:
 
 Note: If you don't want to run the pipeline. You can use either the web app, or download the provided rf_clf.joblib.pkl classifier model and skip to the inference section below.
 
+## Quick Model Metrics
+Random Forest was our best model that displayed good performance while still being fairly balanced across multiple classes, although we do notice a sharp decrease in performance for neutral videos.
+
+<b>On our test set we scored<b>:
+Accuracy Score: 0.8223223223223223
+F1 scores: {'f1_weighted': 0.797295771380408, 'f1_macro': 0.5991905900408122, 'f1_micro': 0.8223223223223223}
+MCC: 0.5648954052150839
+
+<b>Note:</b> Our model was trained on english videos. While we do believe our model will still perform fairly well due to the impact of other features, we can't guarantee any accuracy metrics on non-english videos, especially due to current limitations in the sentiment analysis library used. We recognize this may introduce bias into the model, and hopefully can improve it in the future.
+
 ## How Do I Run The Pipeline?
  <b>We have developed a shell script to run our pipeline to download data, process it, and export a trained machine learning model that can be used to classify videos as negative, neutral, or positive</b>. The steps are as follows:
 1. Make sure you are in a linux / unix environment with a bash terminal. (Specifically Debian based distros)
