@@ -186,7 +186,7 @@ Note: We explored using both a custom web scraper as well as the youtube API.
 
 ## Initial Analysis
 With our exported CSV files, we performed multiple initial analysis steps to help uncover any insights regarding the data.
-One of our main goals was to discover if any features were correlated or useful in relation to predicting dislikes, or dislike ratios.
+One of our main goals was to discover if any features were correlated or useful in relation to predicting dislikes, or at least the dislike ratio category based on a set criteria of our research in regards to what youtubers consider a “good” or “bad” video to be in relation to their like to dislike ratio.
 
 Analysis we performed included:
 - PCA Analysis

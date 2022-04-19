@@ -137,7 +137,7 @@ def create_final_dataframe(comment_df=None,archive_df=None):
         "votes",
         "NoCommentsBinary"
     ]
-    if comment_df:
+    if comment_df is not None:
         df_clean= clean_comments(comment_df)
         print("Comments cleaned.")
         df_comments_all= comment_sentiment(df_clean)
