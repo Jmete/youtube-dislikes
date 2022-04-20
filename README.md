@@ -294,7 +294,7 @@ Our overall testing across many different models, parameters, and even sample si
 Other models such as the GBM, MLP, and Transformer performed well in their own resspective ways, but often sacrificed accuracy on the minority negative class that we care about in favor of the majority class which are the positive videos.
 
 ## Model Comparison Table
-The table below showcases different models we trained and tested and their associated performance metrics.
+The table below showcases different models we trained and tested as well as their associated performance metrics.
 Further information and each model's corresponding confusion matrix can be found in our blog post / report.
 
 | Model                     | Accuracy | F1_Macro | F1_Micro | F1_Weighted | MCC    |
