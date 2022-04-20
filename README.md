@@ -348,11 +348,11 @@ One of the most significant benefits of the dislike button on Youtube was the ab
 As our final deliverable for this project, we have developed a web application that embodies the spirit of our project, saving the dislikes. While dislike counts may never make their return, our app attempts to satisfy a viewer's desire to gauge whether or not a video is worth their time to view. Leveraging the Youtube API to download the necessary data to test our trained Random Forest model, the web app takes in either a Youtube Video ID or link, retrieves the desired features, downloads top comment data, and then makes a prediction based on all the data that has been gathered on whether the video is Good, Neutral or Bad. Try out our web application for yourself at [savethedislikes.com](savethedislikes.com)!
 
 # Statement of Work
-James Mete focused on the Data Acquisition and pipeline creation, Feature Selection and Processing, as well as Machine Learning Model Training & Testing
-
-Sashaank Sekar focused on Downloading Comment Data and the development of the Web Application 
+James Mete focused on the Data Acquisition and pipeline creation, Feature Selection and Processing, as well as Machine Learning Model Training & Testing.
 
 Jenna Mekled focused on Feature Engineering & Selection and Preparing Data for Machine Learning. 
+
+Sashaank Sekar focused on Downloading Comment Data and the development of the Web Application.
 
 All members contributed visuals in their respective sections. 
 
