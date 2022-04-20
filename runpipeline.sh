@@ -100,10 +100,23 @@ DB_PW=$(cat config.yml | (shyaml get-value config.dbpw))
 DB_VIDEOTABLE=$(cat config.yml | (shyaml get-value config.dbvideotable))
 
 
-# Create Database and tabless
-printf "Creating database and table if they don't exist..."
-PGPASSWORD=$DB_PW psql -h $DB_IsP -d $DB_NAME -U $DB_USER -p $DB_PORT -a -q -f src/data/create_database.sql
-PGPASSWORD=$DB_PW psql -h $DB_IP -d $DB_NAME -U $DB_USER -p $DB_PORT -a -q -f src/data/create_video_table.sql
+# Create Database
+printf "\nDo you want to create the database? [Select number below]\n"
+select yn in "Yes" "No"; do
+    case $yn in
+        Yes ) PGPASSWORD=$DB_PW psql -h $DB_IP -d $DB_NAME -U $DB_USER -p $DB_PORT -a -q -f src/data/create_database.sql; break;;
+        No ) break;;
+    esac
+done
+
+# Create video_data table
+printf "\nDo you want to create the video_data table in the database? [Select number below]\n"
+select yn in "Yes" "No"; do
+    case $yn in
+        Yes ) PGPASSWORD=$DB_PW psql -h $DB_IP -d $DB_NAME -U $DB_USER -p $DB_PORT -a -q -f src/data/create_video_table.sql; break;;
+        No ) break;;
+    esac
+done
 
 # Load parquet file data into postgres database. File naturally checks if should proceed.
 printf "\nThe next step involves loading data from the parquet files into the database. This can take a long time.\n"
@@ -196,8 +209,8 @@ done
 
 printf "\n"
 
-printf "\nThe next step will train our Random Forest model and export it as a pickle file.\n"
-printf "\nDo you want to start training and exporting the model? [Select number below]\n"
+printf "\n The next step will train our Random Forest model and export it as a pickle file. \n"
+printf "\n Do you want to start training and exporting the model? [Select number below] \n"
 select yn in "Yes" "No"; do
     case $yn in
         Yes ) python src/models/train_model.py ; break;;
