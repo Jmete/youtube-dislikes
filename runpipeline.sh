@@ -24,7 +24,7 @@ which conda || \
 (printf "Error: Please install Miniconda\nhttps://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html\n" && exit 1)
 
 # Create a new conda env to control our packages for the pipeline.
-conda create --name "yd-mads-pipeline" python=3.8
+conda create --name "yd-mads-pipeline" python=3.8 pip
 
 # Activate new env
 source ~/miniconda3/etc/profile.d/conda.sh

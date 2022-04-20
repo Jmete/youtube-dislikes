@@ -280,10 +280,73 @@ Exported models are saved using the joblib.dump function and saved in the models
 Note: By default we export a compressed model (compression=3), but for our web app we will be using the uncompressed model because it is faster to load despite taking up much more space (945 MB vs. 188 MB for the compressed version.) Furthermore, our testing showed that reducing the number of features did not change the model size much, and neither did training the model on standardized input data.
 
 # Model Results
-TODO
-- Table of various models and their performance across our chosen metrics coming soons
-- Feature Importance Chart
-- Sample size comparison chart
+Our overall testing across many different models, parameters, and even sample size variations put the Random Forest with custom class weights in the top spot with 82% overall accuracy and a 0.80 weighted F1 score on our test set. Specifically, the Random Forest achieved 87% accuracy on the negative videos while retaining 92% accuracy on the positive videos at the expense of the neutral videos which were only 12% accurate. This is ideal for our task where we care more about the minority class (the negatives) but don't want to completely disregard the overall dataset which is dominated by the positive videos. 
+
+Other models such as the GBM, MLP, and Transformer performed well in their own resspective ways, but often sacrificed accuracy on the minority negative class that we care about in favor of the majority class which are the positive videos.
+
+## Model Comparison Table
+The table below showcases different models we trained and tested and their associated performance metrics.
+Further information and each model's corresponding confusion matrix can be found in our blog post / report.
+
+| Model                     | Accuracy | F1_Macro | F1_Micro | F1_Weighted | MCC    |
+|---------------------------|----------|----------|----------|-------------|--------|
+| Dummy                     | 0.5736   | 0.3235   | 0.5736   | 0.5760      | 0.0008 |
+| Logistic Regression       | 0.6218   | 0.3967   | 0.6218   | 0.6324      | 0.3311 |
+| Random Forest             | 0.8216   | 0.6001   | 0.8216   | 0.7973      | 0.5641 |
+| Gradient Boosting Machine | 0.8471   | 0.6493   | 0.8471   | 0.8221      | 0.6093 |
+| MLP                       | 0.8302   | 0.6049   | 0.8302   | 0.8011      | 0.5741 |
+| FastAi-MLP                | 0.6814   | 0.3836   | 0.6814   | 0.6532      | 0.1890 |
+| Transformer               | 0.7718   | 0.5623   | 0.7718   | 0.7650      | 0.4999 |
+
+## Random Forest - Confusion Matrix
+As mentioned earlier, our choice of Random Forest was greatly influenced by its ability to perform well in predicting negative videos without sacrificing performance in regards to the dominant majority of positive videos.
+
+![Random Forest Confusion Matrix](./reports/figures/RF-CMatrix.png)
+
+## Random Forest - Sample Size Comparison Table
+One of our key questions throughout our analysis was how much impact the sample size of the training data had on the overall performance of our model.
+
+Surprisingly, <b>the Random Forest performed nearly as well with 0.0001% (82 rowss of data) of the full training data compared to the full set of 815,194 rows. We believe this shows that our feature selection process was effective at introducing strong early signals to the Random Forest.</b>
+
+| Sample Fraction | Accuracy | F1_Macro | F1_Micro | F1 Weighted Score | MCC    | Number of Rows |
+|-----------------|----------|----------|----------|-------------------|--------|----------------|
+| 0.0001          | 0.8094   | 0.5260   | 0.8094   | 0.7681            | 0.5366 | 82             |
+| 0.0010          | 0.8099   | 0.5521   | 0.8099   | 0.7774            | 0.5390 | 815            |
+| 0.01            | 0.8148   | 0.5599   | 0.8148   | 0.7823            | 0.5479 | 8152           |
+| 0.1             | 0.8173   | 0.5896   | 0.8173   | 0.7925            | 0.5541 | 81519          |
+| 1.0             | 0.8212   | 0.5991   | 0.8212   | 0.7967            | 0.5628 | 815194         |
+
+## Random Forest - Feature Importance
+
+As mentioned above, choosing important features is important to achieving good results, especially when data is limited. One of the best aspects of the Random Forest model besides the overall performance with minimal tuning and standardization is the fact that it is a very interpretable model. It's rather simple decision tree structure, and ability to clearly calculate feature importance metrics is very helpful for both understanding the model as well as explaining the results to any potential stakeholders. 
+
+Our feature importance analysis revealed that like_count was the most important feature, followed by the view_like_ratio_smoothed as well as the view_count. Other features such as duration and our sentiment columns also helped a decent amount. It also helped showcase that certain features such as our boolean columns of age_limit, is_live_enabled, and is_comments_enabled to be less useful. In fact, we tested removing multiple features based on our results and faced limited degredation in terms of predictive performance, although the model did start to drift towards heavily predicting the positive class (1) as more features were removed. Our final model uses all the features due to our intention to maximize predictive performance over runtime or storage costs, but removing minimal features can be useful if the model is intended to be used in a scaled-up version in the future.
+
+![Random Forest Feature Importance Chart](./reports/figures/rf_feature_importance.png)
+
+# Web App
+We have developed a web app that easily allows a user to submit a video ID or url and receive a prediction based on our model of whether that video is considered negative, neutral, or positive. The process is as follows:
+- The server takes in the video, and runs our Youtube API and web scraper for relevant data to fit the columns we have trained our model on.
+- We run the retrieved data through a similar processing pipeline that was used to train the model in order to generate a dataframe suitable for model inference.
+- We load our trained Random Forest model (exported via our overall pipeline as a .joblib.pkl file) on the server.
+- Our model generates the prediction based on the data provided which we then showcase to the user along with other relevant video information.
+
+# Conclusion
+One of the greatest benefits of the dislike button in Youtube was the ability for an individual to be able to assess the potential quality of a video prior to watching it. Removing the dislike button was Youtubes attempt to promote respectful interactions between viewers and creators, but viewers now lose out on a viable metric of ascertaining video quality. As our final deliverable for this project we have developed a wep application that embodies the spirit of our project, saving the dislikes. 
+
+Leveraging the Youtube API to download the necessary data to test on our trained Random Forest model, the app takes in either a Youtube Video ID or link, retrieves the desired  features, downloads top comment data, and then makes a prediction based on all the data that has been gathered on whether the video is Good, Neutral or Bad. While dislike counts may never make their return, our app attempts to satisfy a viewer's desire to gauge whether or not a video is worth their time to view. Try out our web application for yourself at savethedislikes.com!
+
+# Statement of Work
+James Mete focused on the Data Acquisition and pipeline creation, Feature Selection and Processing, as well as Machine Learning Model Training & Testing
+
+Sashaank Sekar focused on Downloading Comment Data and the development of the Web Application 
+
+Jenna Mekled focused on Feature Engineering & Selection and Preparing Data for Machine Learning. 
+
+All members contributed visuals in their respective sections. 
+
+Special thanks to Michelle LeBlanc for contributing so much of her time to us providing feedback and guidance throughout this project. We would also like to thank the other instructors and teaching team members at the University of Michigan for their guidance along the way. Go Blue!
+
 
 
 
