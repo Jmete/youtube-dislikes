@@ -340,10 +340,12 @@ We have developed a web app that easily allows a user to submit a video ID or ur
 - We load our trained Random Forest model (exported via our overall pipeline as a .joblib.pkl file) on the server.
 - Our model generates the prediction based on the data provided which we then showcase to the user along with other relevant video information.
 
-# Conclusion
-One of the greatest benefits of the dislike button in Youtube was the ability for an individual to be able to assess the potential quality of a video prior to watching it. Removing the dislike button was Youtubes attempt to promote respectful interactions between viewers and creators, but viewers now lose out on a viable metric of ascertaining video quality. As our final deliverable for this project we have developed a wep application that embodies the spirit of our project, saving the dislikes. 
+![SaveTheDislikes Web App](./reports/figures/savethedislikes-website.png)
 
-Leveraging the Youtube API to download the necessary data to test on our trained Random Forest model, the app takes in either a Youtube Video ID or link, retrieves the desired  features, downloads top comment data, and then makes a prediction based on all the data that has been gathered on whether the video is Good, Neutral or Bad. While dislike counts may never make their return, our app attempts to satisfy a viewer's desire to gauge whether or not a video is worth their time to view. Try out our web application for yourself at savethedislikes.com!
+# Conclusion
+One of the most significant benefits of the dislike button on Youtube was the ability for an individual to assess the potential quality of a video prior to watching it. Removing the dislike button was Youtube'sYoutube's attempt to promote respectful interactions between viewers and creators, but viewers now lose out on a viable metric for ascertaining video quality. After retrieving and processing archived data from a repository of Youtube videos and supplementing it with web scraped comment data for each video, we successfully trained a Random Forest Model. The performance of our model, in terms of predicting whether a video can be categorized as "Good", "Neutral", or "Bad", produced results including an accuracy score of 82% and an F1 score of 80%. 
+
+As our final deliverable for this project, we have developed a web application that embodies the spirit of our project, saving the dislikes. While dislike counts may never make their return, our app attempts to satisfy a viewer's desire to gauge whether or not a video is worth their time to view. Leveraging the Youtube API to download the necessary data to test our trained Random Forest model, the web app takes in either a Youtube Video ID or link, retrieves the desired features, downloads top comment data, and then makes a prediction based on all the data that has been gathered on whether the video is Good, Neutral or Bad. Try out our web application for yourself at [savethedislikes.com](savethedislikes.com)!
 
 # Statement of Work
 James Mete focused on the Data Acquisition and pipeline creation, Feature Selection and Processing, as well as Machine Learning Model Training & Testing
