@@ -51,6 +51,10 @@ MCC: 0.5648954052150839
 2. Install Miniconda: https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html
 3. Setup a postgres database.
 4. Fill out the config.yml file as directed. This is mainly used to locate your storage location of large files, and database parameters.
+5. You may need to edit the ./runpipeline.sh file to make it executable. (chmod +x runpipeline.sh)
+6. Run ./runpipeline.sh and follow the prompts.
+
+Congratulations, you will end up with a trained Random Forest model that can be used to predict youtube videos (based on the relevant data we will mention below) as either negative (-1), neutral (0), or positive (1). It should be noted that this score is NOT referring to sentiment of the video itself, but rather perception of the video in the eyes of the community based on likes and dislikes, the latter of which we can no longer publically view.
 
 ## Using the model at inference time.
 Our model is a Random Forest model that was trained on youtube api data including comments, and expects the input data in a dataframe. For some elements of this, you may need access to the Youtube API. The steps for inference are:
@@ -280,6 +284,9 @@ We developed a script (train_model.py) which will use the training_df and testin
 Exported models are saved using the joblib.dump function and saved in the models folder as pickle files. The exported file will be called "rfclf.joblib.pkl".
 
 Note: By default we export a compressed model (compression=3), but for our web app we will be using the uncompressed model because it is faster to load despite taking up much more space (945 MB vs. 188 MB for the compressed version.) Furthermore, our testing showed that reducing the number of features did not change the model size much, and neither did training the model on standardized input data.
+
+## Ready-made pipeline
+We developed a bash shell script, runpipeline.sh, which can be usesd to run the entire process from data acquisition to model training resulting in an exported Random Forest pickle file that can be used for inference. Details of which are above in the TLDR section, following the promots displayed by the script during runtime, as well as by reading the comments in the script itself.
 
 # Model Results
 Our overall testing across many different models, parameters, and even sample size variations put the Random Forest with custom class weights in the top spot with 82% overall accuracy and a 0.80 weighted F1 score on our test set. Specifically, the Random Forest achieved 87% accuracy on the negative videos while retaining 92% accuracy on the positive videos at the expense of the neutral videos which were only 12% accurate. This is ideal for our task where we care more about the minority class (the negatives) but don't want to completely disregard the overall dataset which is dominated by the positive videos. 
