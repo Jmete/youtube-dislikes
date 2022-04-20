@@ -334,7 +334,7 @@ Our feature importance analysis revealed that like_count was the most important 
 ![Random Forest Feature Importance Chart](./reports/figures/rf_feature_importance.png)
 
 # Web App
-We have developed a web app that easily allows a user to submit a video ID or url and receive a prediction based on our model of whether that video is considered negative, neutral, or positive. The process is as follows:
+We have developed a [web app](savethedislikes.com) that easily allows a user to submit a video ID or url and receive a prediction based on our model of whether that video is considered negative, neutral, or positive. The process is as follows:
 - The server takes in the video, and runs our Youtube API and web scraper for relevant data to fit the columns we have trained our model on.
 - We run the retrieved data through a similar processing pipeline that was used to train the model in order to generate a dataframe suitable for model inference.
 - We load our trained Random Forest model (exported via our overall pipeline as a .joblib.pkl file) on the server.
