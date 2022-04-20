@@ -1,3 +1,5 @@
+![SaveTheDislikes Logo](./SaveTheDislikes-Logo-WhiteBG.png)
+
 # youtube-dislikes
 University of Michigan - MADS - Capstone Project - Analysis and Prediction of dislikes on Youtube data
 
@@ -12,7 +14,7 @@ Dislike counts on Youtube videos are a useful signal for separating high quality
 # Dataset
 Since Youtube has removed the ability to actively scrape or query dislike counts, we have to rely on historical data to conduct our research. Luckily, extensive historical records have been kept by Archive.org, and we will use one called “Youtube Metadata Collection (2019-02)” (https://archive.org/details/Youtube_metadata_02_2019) which consists of around 1.46 Billion JSON records related to youtube metadata such as title, upload date, category, likes, dislikes, language, recommended videos, and other features. This is composed of around 5000 .tar files each with around 146 .json.gz files inside them which will require extensive data processing to download the files, process them, and store the data for future analysis. 
 
-Our processing techniques will involve taking a sample of the full dataset (we downloaded the first 25 files and then every fifth file afterwards for a total of 1025 .tar files) as well as removing potential NaN / Errors in calculated fields such as the like_dislike_ratio. The end result is a dataset of <b>80,910,144 rows</b>. We can conduct large-scale analysis using SQL commands over the full dataset.
+Our processing techniques will involve taking a sample of the full dataset (we downloaded the first 25 files and then every fifth file afterwards for a total of 1025 .tar files) as well as removing potential NaN / Errors in calculated fields such as the like_dislike_ratio. The end result is a dataset of **80,910,144 rows**. We can conduct large-scale analysis using SQL commands over the full dataset.
 
 We will complement this dataset with scraped comments of top videos (based on view count) to both add an element of NLP analysis which may also be a useful signal towards predicting whether or not a video may have a high number of dislikes.
 
@@ -36,15 +38,15 @@ Note: If you don't want to run the pipeline. You can use either the web app, or 
 ## Quick Model Metrics
 Random Forest was our best model that displayed good performance while still being fairly balanced across multiple classes, although we do notice a sharp decrease in performance for neutral videos.
 
-<b>On our test set we scored<b>:
+**On our test set we scored**:
 Accuracy Score: 0.8223223223223223
 F1 scores: {'f1_weighted': 0.797295771380408, 'f1_macro': 0.5991905900408122, 'f1_micro': 0.8223223223223223}
 MCC: 0.5648954052150839
 
-<b>Note:</b> Our model was trained on english videos. While we do believe our model will still perform fairly well due to the impact of other features, we can't guarantee any accuracy metrics on non-english videos, especially due to current limitations in the sentiment analysis library used. We recognize this may introduce bias into the model, and hopefully can improve it in the future.
+**Note:** Our model was trained on english videos. While we do believe our model will still perform fairly well due to the impact of other features, we can't guarantee any accuracy metrics on non-english videos, especially due to current limitations in the sentiment analysis library used. We recognize this may introduce bias into the model, and hopefully can improve it in the future.
 
 ## How Do I Run The Pipeline?
- <b>We have developed a shell script to run our pipeline to download data, process it, and export a trained machine learning model that can be used to classify videos as negative, neutral, or positive</b>. The steps are as follows:
+ **We have developed a shell script to run our pipeline to download data, process it, and export a trained machine learning model that can be used to classify videos as negative, neutral, or positive**. The steps are as follows:
 1. Make sure you are in a linux / unix environment with a bash terminal. (Specifically Debian based distros)
 2. Install Miniconda: https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html
 3. Setup a postgres database.
@@ -90,7 +92,7 @@ This is running as a KVM virtual machine inside a host server with the following
 - Linux (Unraid)
 
 ## Setting up your environment
-We have used conda as an environment manager starting with the <b>rapids-ai template environment</b> (https://rapids.ai/start.html) which allows us access to gpu enabled processing libraries such as cuDF. We then add on to that environment with other needed packages as detailed in the <b>requirements.txt</b> file.
+We have used conda as an environment manager starting with the **rapids-ai template environment** (https://rapids.ai/start.html) which allows us access to gpu enabled processing libraries such as cuDF. We then add on to that environment with other needed packages as detailed in the **requirements.txt** file.
 
 ### Important packages & libraries include:
 - Rapids AI suite (cuDF)
@@ -134,20 +136,20 @@ After editing the file as detailed inside the template, you should rename it to 
 ## Downloading the dataset
 As mentioned previously, we will use a historical dataset called “Youtube Metadata Collection (2019-02)” which is located at https://archive.org/details/Youtube_metadata_02_2019
 
-Running the <b>downloadtars.py</b> file allows the users to incrementally download the .tar files from archive.org. The script monitors the storagepath folder to check for downloaded files and skips them if detected. This helps if the script fails during procsesing and needs to be restarted.
+Running the **downloadtars.py** file allows the users to incrementally download the .tar files from archive.org. The script monitors the storagepath folder to check for downloaded files and skips them if detected. This helps if the script fails during procsesing and needs to be restarted.
 
 We highly suggest using a NAS (network attached storage) for this since the massive dataset can be hundreds of GB in size. 
 
 ## Processing JSON
-Running <b>combinejson.py</b> will go to the storagepath location, and process json files in batches by loading a user-specificed amount (which should be set depending on your memory capacity) into Pandas, and then exports the data into parquet files in a parq folder inside the storagepath location.
+Running **combinejson.py** will go to the storagepath location, and process json files in batches by loading a user-specificed amount (which should be set depending on your memory capacity) into Pandas, and then exports the data into parquet files in a parq folder inside the storagepath location.
 
 Doing so allows us to reduce over 140,000 JSON files into 301 Parquet files (each ~1,000,000 rows of data). While this adds an extremely lengthy processing step instead of directly going from JSON -> PostgreSQL, we found that pre-processing into parquet files can help with initial analysis and reduce IO bottlenecks later on when loading data into PostgreSQL.
 
-<b>Note:</b> combinejson.py will create .pickle files it will use to store which paths it has already processed which will enable it to skip already processed files which helps if it ever gets stopped before completion.
+**Note:** combinejson.py will create .pickle files it will use to store which paths it has already processed which will enable it to skip already processed files which helps if it ever gets stopped before completion.
 
 ## Loading data into PostgreSQL
 
-Running <b>dataentry_from_parquet.py</b> will loop through the stored parquet files based on the storagepath variable (where combinejson.py saved them), performs some initial data cleaning and processing, arranges and renames the columns in the same order/name as the PostgreSQL table schema expects, and then loads the data into the database table.
+Running **dataentry_from_parquet.py** will loop through the stored parquet files based on the storagepath variable (where combinejson.py saved them), performs some initial data cleaning and processing, arranges and renames the columns in the same order/name as the PostgreSQL table schema expects, and then loads the data into the database table.
 
 Data processing steps performed at this step include:
 - Converting date columns to datetime format.
@@ -157,9 +159,9 @@ Data processing steps performed at this step include:
 - Rename and Reorder columns to match database table schema.
 - Loads data into PostgreSQL using batch importing utilizing the pd.to_sql command with multi mode enabled and a chunksize of 10,000 as default.
 
-<b>Note:</b> dataentry_from_parquet.py will create .pickle files it will use to store which paths it has already processed which will enable it to skip already processed files which helps if it ever gets stopped before completion.
+**Note:** dataentry_from_parquet.py will create .pickle files it will use to store which paths it has already processed which will enable it to skip already processed files which helps if it ever gets stopped before completion.
 
-<b>Note:</b> After initial investigation, we decided to go with dislike_like_ratio, although this is not present in the script. This is because it is included as a calcualated column in PostgreSQL itself. Furthermore, we used a normalization technique of adding 1 to the numerator and denominator to avoid any 0 division errors as well as avoiding too many rows simply being 0 (due to 0/X = 0). This column is a major focal point of our research since it allows us to sort the database by the dislike_like_ratio as well as determine roughly how problematic a video is. However, we will not be able to calculate this in a real-life situation due to the dislike data being hidden which is a future challenge. Thus, we must find suitable proxies during our analysis stage.
+**Note:** After initial investigation, we decided to go with dislike_like_ratio, although this is not present in the script. This is because it is included as a calcualated column in PostgreSQL itself. Furthermore, we used a normalization technique of adding 1 to the numerator and denominator to avoid any 0 division errors as well as avoiding too many rows simply being 0 (due to 0/X = 0). This column is a major focal point of our research since it allows us to sort the database by the dislike_like_ratio as well as determine roughly how problematic a video is. However, we will not be able to calculate this in a real-life situation due to the dislike data being hidden which is a future challenge. Thus, we must find suitable proxies during our analysis stage.
 
 ## Optimizing the database
 We entered multiple commands through psql to optimize the database. We performed the "ANALYZE" command on the table, as well as created an index for important columns used for lookups or sorting which are view_count,like_count,dislike_count, and dislike_like_ratio. Please see the related "optimizedb.sql" file for details on the commands entered.
@@ -185,7 +187,7 @@ In order to gain further insight and acquire more data for our model to use, we 
 
 We modified a package on github (cdownload_noargs.py: https://github.com/egbertbouman/youtube-comment-downloader) in order to aid our web scraping of comments, and then made our own python file to integrate with the modified function in order to automatically loop through the videos, download the comments and related data, and store them in both individual JSON files as well as overall CSV files.
 
-Running the <b>download_main_args_inputfile.py</b> function can take in the related name of the exported CSV file (such as the random 1% sample), the starting point, and a parameter for whether it should convert the CSV file id column to a list that it can loop through. Example of running it may be:
+Running the **download_main_args_inputfile.py** function can take in the related name of the exported CSV file (such as the random 1% sample), the starting point, and a parameter for whether it should convert the CSV file id column to a list that it can loop through. Example of running it may be:
 python src/data/download_main_args_inputfile.py 0 n nameofcsvfile
 
 By default, it will look in the data/processed folder to find the csv files. It will save the comments to data/processed/comments_csv/filename/
@@ -238,7 +240,7 @@ Running data_prep_for_model.py will perform this pipeline automatically by takin
 Note: At inference time, we perform a similar function to prepare the data that we pull from the API + Comments, but slightly modified to account for which data is available and the way we can get the data since it will only need to input one video at a time instead of a batch of existing data.
 
 # Machine Learning Model Training & Testing
-We explored numerous types of models to determine which model had the best performance for our task. It should be noted that our task in this case is not actually to get the overall best performance on the entire dataset, but rather a specific focus on identifying negative videos. Thus, we relied on numerous metrics to help give a holistic view of the models performance. <b>We ultimately decided on Random Forest as the best overall choice.</b>
+We explored numerous types of models to determine which model had the best performance for our task. It should be noted that our task in this case is not actually to get the overall best performance on the entire dataset, but rather a specific focus on identifying negative videos. Thus, we relied on numerous metrics to help give a holistic view of the models performance. **We ultimately decided on Random Forest as the best overall choice.**
 
 ## Performance Metrics Used
 
@@ -301,12 +303,12 @@ Further information and each model's corresponding confusion matrix can be found
 ## Random Forest - Confusion Matrix
 As mentioned earlier, our choice of Random Forest was greatly influenced by its ability to perform well in predicting negative videos without sacrificing performance in regards to the dominant majority of positive videos.
 
-![Random Forest Confusion Matrix](./reports/figures/RF-CMatrix.png)
+![Random Forest Confusion Matrix](./reports/figures/RF-CMatrix-WhiteBG.png)
 
 ## Random Forest - Sample Size Comparison Table
 One of our key questions throughout our analysis was how much impact the sample size of the training data had on the overall performance of our model.
 
-Surprisingly, <b>the Random Forest performed nearly as well with 0.0001% (82 rowss of data) of the full training data compared to the full set of 815,194 rows. We believe this shows that our feature selection process was effective at introducing strong early signals to the Random Forest.</b>
+Surprisingly, **the Random Forest performed nearly as well with 0.0001% (82 rowss of data) of the full training data compared to the full set of 815,194 rows. We believe this shows that our feature selection process was effective at introducing strong early signals to the Random Forest.**
 
 | Sample Fraction | Accuracy | F1_Macro | F1_Micro | F1 Weighted Score | MCC    | Number of Rows |
 |-----------------|----------|----------|----------|-------------------|--------|----------------|
