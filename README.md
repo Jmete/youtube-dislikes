@@ -345,6 +345,11 @@ We have developed a [web app](savethedislikes.com) that easily allows a user to 
 
 ![SaveTheDislikes Web App](./reports/figures/savethedislikes-website.png)
 
+# Future Direction
+In the process of training our model, it was interesting to observe that the transformer on numeric data input as text performed as well as it did. Given this information, we believe an area for future research is utilizing the full text of comments/descriptions and more tuning of the deep learning model and using other larger pre-trained models to examine its performance on similar data. Our model was trained on English videos. While we do believe our model will still perform reasonably well due to the impact of other features, we can't guarantee any accuracy metrics on non-English videos, primarily due to current limitations in the sentiment analysis library used. We recognize this may introduce bias into the model and hopefully can improve it in the future. 
+
+Other options for improving our model include exploring new features such as subscriber count and other related video metrics as well as actual video content using CNNs (Convolutional Neural Network) or ViTs (Visual Transformers) to better understand the video. Transcript information from videos could also prove to be a valuable source for our model using transformers. Lastly, we would consider allowing users to confirm or deny if the model's prediction is correct in our future research. Even though this may introduce some user bias, ultimately, it would extend our data and train the model again for better possible results.
+
 # Conclusion
 One of the most significant benefits of the dislike button on Youtube was the ability for an individual to assess the potential quality of a video prior to watching it. Removing the dislike button was Youtube'sYoutube's attempt to promote respectful interactions between viewers and creators, but viewers now lose out on a viable metric for ascertaining video quality. After retrieving and processing archived data from a repository of Youtube videos and supplementing it with web scraped comment data for each video, we successfully trained a Random Forest Model. The performance of our model, in terms of predicting whether a video can be categorized as "Good", "Neutral", or "Bad", produced results including an accuracy score of 82% and an F1 score of 80%. 
 
