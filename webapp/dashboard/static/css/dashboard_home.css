@@ -1,0 +1,48 @@
+body {
+  font-family: "Raleway", sans-serif;
+  background-color: #f4f4f4;
+}
+
+h1 {
+  font-family: "Raleway", sans-serif;
+  font-weight: 900;
+}
+
+p {
+  font-size: 1.3em;
+}
+
+.intoduction {
+  margin-top: 100px;
+}
+
+.title {
+  font-size: 5em;
+  text-align: center;
+}
+
+.sub_title {
+  text-align: center;
+  font-size: 1.5em !important;
+  padding: 0px 300px;
+}
+
+.part_container {
+  padding: 100px 250px;
+}
+
+.part_dropdown {
+  margin: 50px 0px;
+  width: 100%;
+}
+
+.center_helper_text {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.center_helper_text p {
+  color: #B0B5B3;
+}

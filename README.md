@@ -343,6 +343,8 @@ We have developed a [web app](savethedislikes.com) that easily allows a user to 
 - We load our trained Random Forest model (exported via our overall pipeline as a .joblib.pkl file) on the server.
 - Our model generates the prediction based on the data provided which we then showcase to the user along with other relevant video information.
 
+Note: We are currently using standard Youtube API access which allows for 10,000 calls per day. If more access is needed, we may be able to get our limit upgraded by Youtube. However, we are caching searched videos in a database to help improve performance and reduce API calls.
+
 ![SaveTheDislikes Web App](./reports/figures/savethedislikes-website.png)
 
 # Future Direction

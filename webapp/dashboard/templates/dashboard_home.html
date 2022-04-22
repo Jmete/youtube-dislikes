@@ -1,0 +1,85 @@
+{% extends 'main_app_base.html' %}
+{% load static %}
+
+{% block title %}dashboard{% endblock title %}
+
+{% block header %}
+
+<link rel="stylesheet" href="{% static 'css/dashboard_home.css' %}" />
+
+<script src="{% static 'js/dashboard_home.js' %}"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;900&display=swap" rel="stylesheet">
+
+{% endblock header %}
+
+{% block content %}
+
+<div class="container-fluid">
+    <div class="intoduction">
+        <h1 class="title">Everything we did with our data</h1>
+    </div>
+
+    <div class="part1 part_container">
+        <h1 class="mt-5">Dataset analysis</h1>
+        <p>For a visual overview of the various statistical representations of our dataset we have created the following
+            visualizations so our users can gain a better understanding of what data our model has trained on.</p>
+        <select class="form-select part_dropdown" id="part1_dropdown" action="{% url 'part1' %}" name="part1_dropdown">
+            <option value="1">Different categories</option>
+            <option value="2">Total likes by year</option>
+            <option value="3">Total dislikes by year</option>
+            <option value="4">Total views by year</option>
+            <option value="5">Average likes by year</option>
+            <option value="6">Average dislikes by year</option>
+            <option value="7">Average views by year</option>
+            <option value="8">Dataset size at different stages (Bar)</option>
+            <option value="9">Dataset size at different stages (Pie)</option>
+            
+        </select>
+        <div class="part1_graph">
+            {{default_part1|safe}}
+        </div>
+
+    </div>
+
+    <div class="part2 part_container">
+        <h1 class="mt-5">Feature selection process</h1>
+        <p>We performed multiple initial analysis steps to help uncover any insights regarding the data. One of our main
+            goals was to discover if any features were correlated or valuable for predicting our video ranking
+            category.The analysis we performed included a statistical analysis of our dataset Principal Component
+            Analysis and a Feature Correlation Analysis.</p>
+        <select class="form-select part_dropdown" id="part2_dropdown" action="{% url 'part2' %}" name="part2_dropdown">
+            <option value="1">Random forest feature importance</option>
+            <option value="2">Correlation Matrix</option>
+            <option value="3">PCA heatmap</option>
+            <option value="4">Duration split by target</option>
+            <option value="5">Number of videos in each target based on 1% random sample of our data</option>
+
+        </select>
+        <div class="part2_graph">
+            {{default_part2|safe}}
+        </div>
+
+    </div>
+
+    <div class="part3 part_container mb-5">
+        <h1 class="mt-5">Model analysis</h1>
+        <p>After selecting our features and preparing our data we ran it through various models to ensure that we
+            produced the best results possible. In total we attempted seven different models and the results can be found
+            below.</p>
+        <select class="form-select part_dropdown" id="part3_dropdown" action="{% url 'part3' %}" name="part3_dropdown">
+            <option value="1">Random forest confusion matrix</option>
+            <option value="2">Random forest feature scaled confusion matrix</option>
+            <option value="3">Comparing model performance</option>
+            <option value="4">Random forest sample size comparison table</option>
+            <option value="5">Random forest sample size comparison line chart</option>
+        </select>
+        <div class="part3_graph">
+            {{default_part3|safe}}
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

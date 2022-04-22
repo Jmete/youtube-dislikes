@@ -1,0 +1,290 @@
+{% extends 'main_app_base.html' %}
+{% load static %}
+
+{% block title %}home{% endblock title %}
+
+{% block header %}
+
+<link rel="stylesheet" href="{% static 'css/main_app_homepage.css' %}" />
+
+<script src="{% static 'js/prediction.js' %}"></script>
+<script src="{% static 'js/user_select.js' %}"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;900&display=swap" rel="stylesheet">
+
+{% endblock header %}
+
+{% block content %}
+
+<div class="modal" tabindex="-1" id="ackModal">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h1 class="text-center mt-5 mb-5">Acknowledgements</h1>
+                <p class="ack_subtitle">
+                    This model was trained on english videos ONLY. Due to our imbalanced dataset ("good"
+                    videos are more prevalent than "bad" or "neutral" videos), we focused on various F1 scores,
+                    Accuracy, and MCC (Matthews correlation coefficient) to track model performance. <br><br>
+                    
+                    While we do believe our model will still perform fairly well due to the impact of other features, we can't guarantee any
+                    accuracy metrics on non-english videos, especially due to current limitations in the sentiment
+                    analysis library used. We recognize these elements may introduce bias into the model, and hopefully
+                    can improve it in the future! <br><br>
+
+                    For further information on our methodology you can visit our <a>Medium article</a> or <a>Github repository</a>
+                </p>
+
+                <div class="d-grid gap-2 mt-5 mb-5">
+                    <button type="button" class="btn btn-lg btn-outline-primary" data-bs-dismiss="modal">I
+                        understand</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="intro_container">
+        <img src="{% static 'images/logo.png' %}" alt="logo" class="logo">
+        <h1 class="title text-danger">SAVE THE DISLIKES</h1>
+        <p class="sub_title">Enter a youtube link or a youtube video ID to predict if the video is "Good" or "Bad"
+            in nature. To understand how we are making the prediction, navigate to the project explained or github
+            repository.</p>
+
+    </div>
+
+    <div class="form_container">
+        <div class="form">
+            <form action="{% url 'process_url' %}" method="post" id="youtube_link_form">
+                {% csrf_token %}
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control youtube_link_input"
+                        placeholder="Put the youtube link or video id" aria-label="youtube_submit_input"
+                        aria-describedby="youtube_submit_button" name="youtube_submit_input">
+                    <button class="btn youtube_submit_button" type="submit" id="youtube_submit_button">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="loading_gif_container">
+        <img src="{% static 'images/loading_gif.gif' %}" id='loader' alt="loading">
+    </div>
+
+    <div class="video_deets">
+        <div class="alert alert-dismissible fade show" id="status" role="alert">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="video_embed mt-5 mb-5">
+            <div class="ratio ratio-16x9 iframe_container">
+            </div>
+        </div>
+        
+        <div class="prediction_container">
+            <h1 class="text-center prediction_title"></h1>
+        </div>
+
+        <div class="user_target_select">
+            <h1 class="user_target_select_title text-center">Do you think the prediction is correct?</h1>
+            <p class="text-center user_target_select_subtitle">What do you think the prediction should be?</p>
+
+            <div class="target_buttons d-flex justify-content-between">
+                <button class="target_button btn btn-outline-success" id="user_select_positive_button" type="button"
+                    action="{% url 'user_select_positive' %}" data-bs-toggle="modal"
+                    data-bs-target="#thank_model">Positive</button>
+
+                <button class="target_button btn btn-outline-danger" id="user_select_negative_button" type="button"
+                    action="{% url 'user_select_negative' %}" data-bs-toggle="modal"
+                    data-bs-target="#thank_model">Negative</button>
+            </div>
+
+            <p class="text-center user_target_select_subtitle">Your input will help us train our model better</p>
+        </div>
+
+        <div class="accordion accordion-flush" id="video_meta_accordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        Video Description
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
+                    data-bs-parent="#video_meta_accordion">
+                    <div class="accordion-body">
+                        <h3 id="video_title"></h3>
+                        <hr class="divider">
+                        <p id="video_description"></p>
+                    </div>
+                    <div class="video_meta_table_container">
+                        <table class="table table-hover video_table">
+                            <thead id="meta_table_heading">
+                                <tr>
+                                    <th>Views</th>
+                                    <th>Date published</th>
+                                    <th>Likes</th>
+                                    <th>Total comments</th>
+                                    <th>Channel name</th>
+                                    <!-- <th>Channel Subscribers</th> -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td id="video_views"></td>
+                                    <td id="video_pdate"></td>
+                                    <td id="video_likes"></td>
+                                    <td id="comments_count"></td>
+                                    <td><a id="channel_name"></a></td>
+                                    <!-- <td id="channel_subscribers"></td> -->
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingTwo">
+                    <button class="accordion-button  collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                        Tags<span class="badge bg-primary total_tags"></span>
+                    </button>
+                </h2>
+                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+                    data-bs-parent="#video_meta_accordion">
+                    <div id="video_tags"></div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingThree">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                        Top <span id="top_comment_count"></span> comments
+                    </button>
+                </h2>
+                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
+                    data-bs-parent="#video_meta_accordion">
+                    <div class="comments_container">
+                        <ul class="list-group list-group-flush comments_list"></ul>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingFour">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                        Model features
+                    </button>
+                </h2>
+                <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour"
+                    data-bs-parent="#video_meta_accordion">
+                    <div class="video_meta_table_container">
+                        <table class="table table-hover">
+                            <thead id="feature_table_heading">
+                                <tr>
+                                    <th>Feature name</th>
+                                    <th>Feature value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>Duration</th>
+                                    <td id="feature_duration"></td>
+                                </tr>
+                                <tr>
+                                    <th>Age limit</th>
+                                    <td id="feature_age_limit"></td>
+                                </tr>
+                                <tr>
+                                    <th>View count</th>
+                                    <td id="feature_view_count"></td>
+                                </tr>
+                                <tr>
+                                    <th>Like count</th>
+                                    <td id="feature_like_count"></td>
+                                </tr>
+                                <tr>
+                                    <th>View-like ratio smoothed</th>
+                                    <td id="feature_vl_ratio"></td>
+                                </tr>
+                                <tr>
+                                    <th>Is comments enabled</th>
+                                    <td id="feature_is_comments_enabled"></td>
+                                </tr>
+                                <tr>
+                                    <th>Is live content</th>
+                                    <td id="feature_is_live_content"></td>
+                                </tr>
+                                <tr>
+                                    <th>Category code</th>
+                                    <td id="feature_category"></td>
+                                </tr>
+                                <tr>
+                                    <th>Description neutral</th>
+                                    <td id="feature_desc_neu"></td>
+                                </tr>
+                                <tr>
+                                    <th>Description negative</th>
+                                    <td id="feature_desc_neg"></td>
+                                </tr>
+                                <tr>
+                                    <th>Description positive</th>
+                                    <td id="feature_desc_pos"></td>
+                                </tr>
+                                <tr>
+                                    <th>Description compound</th>
+                                    <td id="feature_desc_compound"></td>
+                                </tr>
+                                <tr>
+                                    <th>Comment neutral</th>
+                                    <td id="feature_comment_neu"></td>
+                                </tr>
+                                <tr>
+                                    <th>Comment negative</th>
+                                    <td id="feature_comment_neg"></td>
+                                </tr>
+                                <tr>
+                                    <th>Comment positive</th>
+                                    <td id="feature_comment_pos"></td>
+                                </tr>
+                                <tr>
+                                    <th>Comment compound</th>
+                                    <td id="feature_comment_compound"></td>
+                                </tr>
+                                <tr>
+                                    <th>Votes</th>
+                                    <td id="feature_votes"></td>
+                                </tr>
+                                <tr>
+                                    <th>No Comments</th>
+                                    <td id="feature_no_comment_binary"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- thank you Modal -->
+        <div class="modal fade" id="thank_model" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <h3 class="thank_you_title">We thank you for your contribution</h3>
+                        <img src="{% static 'images/thank_you.png' %}" alt="thank you" id="thank_you_image">
+                    </div>
+                    <div class="modal-footer">
+                        <small id="attribution"><a href="https://storyset.com/people">People illustrations by
+                                Storyset</a></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,46 @@
+body {
+  font-family: "Raleway", sans-serif;
+  background-color: #f4f4f4;
+  min-height: 100vh;
+}
+
+h1,
+h3 {
+  font-family: "Raleway", sans-serif;
+  font-weight: 900;
+}
+
+p {
+  font-family: "Raleway", sans-serif;
+}
+
+.container {
+  height: 100%;
+}
+
+.navbar_logo {
+  height: 25px;
+  width: auto;
+}
+
+.navbar a {
+  font-size: 1.3em;
+}
+
+.navbar-dropdown {
+  min-width: 200px;
+  width: 480px;
+  margin-top: 10px !important;
+}
+
+.navbar-dropdown-item {
+  font-size: 2em !important;
+  padding: 25px 0px;
+  text-align: center;
+  transition: 0.6s;
+}
+
+.navbar-dropdown-item:hover {
+  background-color: #dc3444;
+  color: #f4f4f4 !important;
+}

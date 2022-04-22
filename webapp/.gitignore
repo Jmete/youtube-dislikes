@@ -1,0 +1,6 @@
+.joblib.pkl
+project_configuration/.env
+db.sqlite3
+__pycache__/
+.DS_Store
+main_app/migrations/0001_initial.py

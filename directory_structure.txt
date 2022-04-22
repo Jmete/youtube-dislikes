@@ -49,4 +49,6 @@
 │
 ├── src <- Mimics our data folder but contains small sample exports since our main data is too large for github.
 |
+├── webapp <- Files for our Django web app.
+|
 └── directory_structure.txt           <- this file describing the directory structure

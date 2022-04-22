@@ -1,0 +1,119 @@
+{% extends 'main_app_base.html' %}
+{% load static %}
+
+{% block title %}home{% endblock title %}
+
+{% block header %}
+
+<!-- <link rel="stylesheet" href="{% static 'css/main_app_homepage.css' %}" /> -->
+
+<script src="{% static 'js/main_app_homepage.js' %}"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;900&display=swap" rel="stylesheet">
+
+<style>
+    .standup_video {
+        width: 80%;
+        margin: 120px 0px;
+        z-index: 10;
+        border-radius: 10px;
+    }
+
+    .standup_desc {
+        font-size: 1.5em;
+    }
+
+    ul {
+        list-style-type: circle;
+    }
+
+    .desc_li {
+        font-size: 1.5em;
+        margin: 20px 0px;
+    }
+
+    iframe {
+        display: block;
+        border-style: none;
+        margin: 0 auto;
+        border-radius: 5px;
+    }
+</style>
+
+{% endblock header %}
+
+{% block content %}
+
+<div class="container">
+    <div class="standup_video">
+        <h1 class="standup_title">Standup 1</h1>
+        <p class="standup_desc" id="standup1_desc">
+            This is the first standup for our University of Michigan Master of Applied Data Science Capstone
+            project.
+
+            Dislike counts on Youtube videos are a useful signal for separating high quality videos from low quality
+            videos or even potential scams. Youtube has recently removed the ability to see dislike count data
+            publicly, and have disabled dislike count data in their API. Thus, our project seeks to understand the
+            trends that influence dislike activity through analytical research and use those insights to generate a
+            machine learning model to predict dislike counts or ratios to help alert users to potentially
+            problematic videos based on the available data and features.
+        </p>
+
+        <div class="ratio ratio-16x9">
+            <iframe src="https://www.youtube.com/embed/HuE58E3ASkE" title="Standup1" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <div class="standup_video mt-5">
+        <h1 class="standup_title">Standup 2</h1>
+        <p class="standup_desc" id="standup2_desc">
+            This is the second standup for our University of Michigan Master of Applied Data Science Capstone
+            project. In this standup we discuss our progress since our last standup including how we overcome
+            some obstacles, how we have begun analyzing the data, and an initial demo of a web app.
+
+            Dislike counts on Youtube videos are a useful signal for separating high quality videos from low
+            quality videos or even potential scams. Youtube has recently removed the ability to see dislike
+            count data publicly, and have disabled dislike count data in their API. Thus, our project seeks to
+            understand the trends that influence dislike activity through analytical research and use those
+            insights to generate a machine learning model to predict dislike counts or ratios to help alert
+            users to potentially problematic videos based on the available data and features.
+        </p>
+        <div class="ratio ratio-16x9">
+            <iframe src="https://www.youtube.com/embed/rikqMJSwTbY" title="Standup2" allowfullscreen></iframe>
+        </div>
+    </div>
+    <div class="standup_video mt-5">
+        <h1 class="standup_title">Standup 3</h1>
+        <p class="standup_desc" id="standup3_desc">This is the third standup for our University of Michigan
+            Master of Applied Data Science Capstone project. In
+            this standup we discuss our progress since our last standup including how we have processed our data to make
+            it suitable for model training, initial testing of different models with the intention of picking a final
+            model to use in production, as well as more progress on our web app.</p>
+
+        <ul>
+            <li class="desc_li">We are web-scraping video comments which will be processed using sentiment analysis and used as extra
+                features and joined based on video_id.</li>
+            <li class="desc_li">In the final pipeline, we will convert these experimentation notebooks to streamlined regular python
+                files
+                to aid in our overall pipeline.</li>
+            <li class="desc_li">We are using F1 score due to imbalanced data in our dataset. There is more liked/positive videos than
+                negative ones.</li>
+        </ul>
+
+        <p class="standup_desc" id="standup3_desc">
+            Dislike counts on Youtube videos are a useful signal for separating high quality videos from low quality
+            videos or even potential scams. Youtube has recently removed the ability to see dislike count data publicly,
+            and have disabled dislike count data in their API. Thus, our project seeks to understand the trends that
+            influence dislike activity through analytical research and use those insights to generate a machine learning
+            model to predict dislike counts or ratios to help alert users to potentially problematic videos based on the
+            available data and features.</p>
+        <div class="ratio ratio-16x9">
+            <iframe src="https://www.youtube.com/embed/BVO3ZFBpy3g" title="Standup3" allowfullscreen></iframe>
+        </div>
+    </div>
+
+</div>
+
+{% endblock content %}
