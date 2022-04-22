@@ -76,15 +76,12 @@ def part3(request):
         graph = open('./graphs/part3/part3_rf_hm.html', 'r').read()
     
     if int(user_select) == 2:
-        graph = open('./graphs/part3/part3_rf_scaled_hm.html', 'r').read()
-    
-    if int(user_select) == 3:
         graph = open('./graphs/part3/part3_model_compare.html', 'r').read()
         
-    if int(user_select) == 4:
+    if int(user_select) == 3:
         graph = open('./graphs/part3/part3_sample_size_table.html', 'r').read()
         
-    if int(user_select) == 5:
+    if int(user_select) == 4:
         graph = open('./graphs/part3/part3_sample_size_line.html', 'r').read()
     
     context = {'html_data': graph}

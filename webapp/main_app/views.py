@@ -21,11 +21,15 @@ def process_url(request):
     if request.method == 'POST':
         video_id = request.POST.get('youtube_submit_input')
 
-        if 'www.youtube.com' in video_id:
+        if 'youtube.com' in video_id:
             video_id = video_id.split('watch?v=')[-1]
+
+        # Helps to get only the video ID characters
+        video_id = video_id[:11]
 
         # we will want to save user input irrespective of whether 24 hours has passed
         # this might be a good metric to understand the popularity of a video in youtube.
+
         database_helper.save_user_input(video_id) # save user input to UserInput table
         
         request.session['video_id'] = video_id
@@ -37,7 +41,7 @@ def process_url(request):
             return JsonResponse(json_data)
             
         else:
-            url = data_generator.check_link(video_id[:11], USER_AGENT)
+            url = data_generator.check_link(video_id, USER_AGENT)
 
             if url == 'Video not found':
                 json_data = {'status': 3}
