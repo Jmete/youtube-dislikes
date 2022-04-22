@@ -13,8 +13,9 @@
 │                         
 │                      
 │
-├── reports            <- Our report
+├── reports            <- Our report & related figures
 │   └── figures        <- Generated graphics and figures to be used in reporting
+│   └── reports        <- Contains our report in PDF format
 │
 ├── requirements.txt   <- The requirements file for reproducing the analysis environment.
 │
@@ -46,4 +47,6 @@
 │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
 │       └── fulldb_stats.py
 │
+├── src <- Mimics our data folder but contains small sample exports since our main data is too large for github.
+|
 └── directory_structure.txt           <- this file describing the directory structure
