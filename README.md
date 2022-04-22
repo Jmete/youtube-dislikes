@@ -32,7 +32,8 @@ We provide the following:
 - A pipeline that can download and process data, train the model, and export it.
 - A web app to easily use the model. [www.savethedislikes.com](https://www.savethedislikes.com)
 - We also have a blog where we discuss our findings in more detail and provide visualizations.
-- [Medium article](https://medium.com/@jmekled/analysis-prediction-of-dislikes-on-youtube-data-5b66c732c634) as an overview of our project. 
+- [Medium article](https://medium.com/@jmekled/analysis-prediction-of-dislikes-on-youtube-data-5b66c732c634) as an overview of our project.
+- sample_data folder with small extracts of data and related SampleData notebook for you to explore.
 
 Note: If you don't want to run the pipeline. You can use either the web app, or download the provided rf_clf.joblib.pkl classifier model and skip to the inference section below.
 
